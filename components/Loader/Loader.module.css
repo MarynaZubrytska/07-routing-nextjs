@@ -1,0 +1,19 @@
+.loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.85;
+  font-size: 14px;
+}
+
+.inlineLoader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.85;
+  font-size: 13px;
+}
+
+.label {
+  user-select: none;
+}
