@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import { fetchNotes } from "@/lib/api";
 
 import SearchBox from "@/components/SearchBox/SearchBox";
@@ -19,19 +20,29 @@ import css from "./Notes.client.module.css";
 const PER_PAGE = 12;
 
 export default function NotesClient() {
+  const params = useParams<{ slug?: string[] }>();
+  const raw = params.slug?.[0];
+  const activeTag = !raw || raw === "all" ? "" : raw;
+
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [debouncedQuery] = useDebounce(query.trim(), 400);
+
   useEffect(() => {
     setPage(1);
-  }, [debouncedQuery]);
+  }, [activeTag, debouncedQuery]);
 
   const { data, isFetching, isError, isSuccess } = useQuery({
-    queryKey: ["notes", debouncedQuery, page, PER_PAGE],
+    queryKey: ["notes", activeTag, page, PER_PAGE, debouncedQuery],
     queryFn: () =>
-      fetchNotes({ page, perPage: PER_PAGE, search: debouncedQuery }),
+      fetchNotes({
+        page,
+        perPage: PER_PAGE,
+        search: debouncedQuery,
+        tag: activeTag ? activeTag : undefined,
+      }),
     placeholderData: keepPreviousData,
   });
 
@@ -42,6 +53,7 @@ export default function NotesClient() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox value={query} onSearch={setQuery} />
+
         {isSuccess && totalPages > 1 && (
           <Pagination
             currentPage={page}
@@ -49,6 +61,7 @@ export default function NotesClient() {
             onPageChange={setPage}
           />
         )}
+
         <button
           type="button"
           className={css.button}
