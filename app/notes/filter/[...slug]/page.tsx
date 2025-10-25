@@ -26,7 +26,7 @@ export default async function FilteredNotesPage({ params }: PageProps) {
           }),
       });
     },
-    <NotesClient />
+    <NotesClient initialTag={tag} />
   );
 
   return element;

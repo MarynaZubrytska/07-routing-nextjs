@@ -1,13 +1,16 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api";
 import Modal from "@/components/Modal/Modal";
 import css from "./NotePreview.client.module.css";
 
-export default function NotePreview() {
-  const { id } = useParams<{ id: string }>();
+interface NotePreviewProps {
+  id: string;
+}
+
+export default function NotePreview({ id }: NotePreviewProps) {
   const router = useRouter();
 
   const {
@@ -17,7 +20,6 @@ export default function NotePreview() {
   } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
-    enabled: !!id,
     refetchOnMount: false,
   });
 
@@ -34,12 +36,10 @@ export default function NotePreview() {
               <h2>{note.title}</h2>
               <span className={css.tag}>{note.tag}</span>
             </div>
-
             <p className={css.content}>{note.content}</p>
             <p className={css.date}>
               {new Date(note.createdAt).toLocaleString()}
             </p>
-
             <button type="button" className={css.backBtn} onClick={handleClose}>
               ← Back
             </button>
